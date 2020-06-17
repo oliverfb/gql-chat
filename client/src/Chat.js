@@ -1,43 +1,19 @@
-import React, { Component } from 'react';
-import { addMessage, getMessages, onMessageAdded } from './graphql/queries';
+import React from 'react';
 import MessageInput from './MessageInput';
 import MessageList from './MessageList';
+import { useChatMessages } from './Hooks';
 
-class Chat extends Component {
-  state = { messages: [] };
-  subscription = null;
-
-  async componentDidMount() {
-    const messages = await getMessages();
-    this.setState({ messages });
-    this.subscription = onMessageAdded((message) => {
-      this.setState({ messages: this.state.messages.concat(message) });
-    });
-  }
-
-  componentWillMount() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
-
-  async handleSend(text) {
-    await addMessage(text);
-  }
-
-  render() {
-    const { user } = this.props;
-    const { messages } = this.state;
-    return (
-      <section className="section">
-        <div className="container">
-          <h1 className="title">Chatting as {user}</h1>
-          <MessageList user={user} messages={messages} />
-          <MessageInput onSend={this.handleSend.bind(this)} />
-        </div>
-      </section>
-    );
-  }
+const Chat = ({ user }) => {
+  const { messages, addMessage } = useChatMessages();
+  return (
+    <section className="section">
+      <div className="container">
+        <h1 className="title">Chatting as {user}</h1>
+        <MessageList user={user} messages={messages} />
+        <MessageInput onSend={addMessage} />
+      </div>
+    </section>
+  );
 }
 
 export default Chat;
